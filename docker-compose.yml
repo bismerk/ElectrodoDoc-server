@@ -44,6 +44,14 @@ services:
        - woden
      restart: unless-stopped
 
+  redis:
+    image: redis
+    container_name: redis
+    volumes:
+      - ./storage/redis:/data
+    entrypoint: redis-server --appendonly yes
+    networks:
+      - woden
 
 volumes:
   api:
