@@ -1,4 +1,4 @@
-# Go API Server for Wooden
+# Go API Server for Woden
 
 Specification for Wooden REST API
 
