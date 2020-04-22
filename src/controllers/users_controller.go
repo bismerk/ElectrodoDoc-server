@@ -53,7 +53,12 @@ func (server *Server) SignIn(username, email, password string) (string, error) {
 	if user.Password != password {
 		return "", err
 	}
-	return auth.CreateToken(user.Username)
+	token, err := auth.CreateToken(user.Username)
+	if err != nil {
+		return "", err
+	}
+	user.Token = token
+	return token, nil
 }
 
 func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
