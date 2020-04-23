@@ -2,9 +2,9 @@ package seed
 
 import (
 	"log"
+	"woden/src/models"
 
 	"github.com/jinzhu/gorm"
-	"woden/src/models"
 )
 
 var users = []models.User{

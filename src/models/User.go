@@ -3,9 +3,13 @@ package models
 import (
 	"errors"
 	"github.com/badoux/checkmail"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/go-redis/redis"
 	"github.com/jinzhu/gorm"
 	"html"
 	"strings"
+	"time"
+	"woden/src/database"
 )
 
 type User struct {
@@ -14,6 +18,12 @@ type User struct {
 	Email    string `gorm:"size:100;not null;unique" json:"email"`
 	Password string `gorm:"size:100;not null;" json:"password"`
 	Token    string `json:"token"`
+}
+
+type Token struct {
+	Token  string
+	UserId string
+	jwt.StandardClaims
 }
 
 func (u *User) Prepare() {
@@ -70,26 +80,44 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 	return u, nil
 }
 
-func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
-	var err error
-	err = db.Debug().Model(User{}).Where("id = ?", uid).Take(&u).Error
+func (u *User) UpdateAUser(db *gorm.DB, id uint32) (*User, error) {
+	db = db.Debug().Model(&User{}).Where("id = ?", id).Take(&User{}).UpdateColumns(
+		map[string]interface{}{
+			"password": u.Password,
+		},
+	)
+	if db.Error != nil {
+		return &User{}, db.Error
+	}
+	// This is the display the updated user
+	err := db.Debug().Model(&User{}).Where("id = ?", id).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}
-	if gorm.IsRecordNotFoundError(err) {
-		return &User{}, errors.New("User Not Found")
-	}
-	return u, err
+	return u, nil
 }
 
-func (u *User) FindUserByName(db *gorm.DB, username string) (*User, error) {
-	var err error
-	err = db.Debug().Model(User{}).Where("username = ?", username).Take(&u).Error
+func Logout(id uint32, token string) (bool, error) {
+	byToken, err := GetToken(token)
+	if byToken == nil {
+		if err := database.ClientForToken.Set(token, id, time.Hour).Err(); err != nil {
+			return false, err
+		}
+		return true, nil
+	}
+	return false, err
+}
+
+func GetToken(token string) (*Token, error) {
+	name, err := database.ClientForToken.Get(token).Result()
+	if err == redis.Nil {
+		return nil, nil
+	}
 	if err != nil {
-		return &User{}, err
+		return nil, errors.New("While getting token")
 	}
-	if gorm.IsRecordNotFoundError(err) {
-		return &User{}, errors.New("User Not Found")
-	}
-	return u, err
+	tokenFromDB := &Token{}
+	tokenFromDB.Token = token
+	tokenFromDB.UserId = name
+	return tokenFromDB, nil
 }
