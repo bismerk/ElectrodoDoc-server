@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"woden/src/models"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres database driver
 
-	"woden/src/models"
 )
 
 type Server struct {
