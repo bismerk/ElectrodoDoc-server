@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/badoux/checkmail"
 	"io/ioutil"
 	"net/http"
 	"woden/src/auth"
@@ -14,27 +15,23 @@ import (
 )
 
 func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-		return
-	}
+
 	user := models.User{}
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-		return
+	if err := checkmail.ValidateFormat(r.FormValue("login")); err != nil {
+		user.Username = r.FormValue("login")
+	} else {
+		user.Email = r.FormValue("login")
 	}
+	user.Password = r.FormValue("password")
 	user.Prepare()
-	err = user.Validate("login")
+	err := user.Validate("login")
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 	token, err := server.SignIn(user.Username, user.Email, user.Password)
 	if err != nil {
-		formattedError := formaterror.FormatError(err.Error())
-		responses.ERROR(w, http.StatusUnprocessableEntity, formattedError)
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 	responses.JSON(w, http.StatusOK, token)
@@ -48,12 +45,14 @@ func (server *Server) SignIn(username, email, password string) (string, error) {
 	} else {
 		err = server.DB.Debug().Model(models.User{}).Where("username = ?", username).Take(&user).Error
 	}
+
 	if err != nil {
-		return "", err
+		return "", errors.New(fmt.Sprintf("%s", err))
 	}
 	if user.Password != password {
-		return "", err
+		return "", errors.New("Wrong password")
 	}
+
 	token, err := auth.CreateToken(user.ID)
 	if err != nil {
 		return "", err
@@ -63,19 +62,14 @@ func (server *Server) SignIn(username, email, password string) (string, error) {
 }
 
 func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-	}
 	user := models.User{}
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-		return
-	}
+	user.Username = r.FormValue("login")
+	user.Email = r.FormValue("email")
+	user.Password = r.FormValue("password")
+
 	user.Prepare()
 
-	err = user.Validate("")
+	err := user.Validate("")
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
