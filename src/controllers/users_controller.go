@@ -15,13 +15,13 @@ import (
 )
 
 func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
-
 	user := models.User{}
 	if err := checkmail.ValidateFormat(r.FormValue("login")); err != nil {
 		user.Username = r.FormValue("login")
 	} else {
 		user.Email = r.FormValue("login")
 	}
+
 	user.Password = r.FormValue("password")
 	user.Prepare()
 	err := user.Validate("login")
@@ -29,36 +29,32 @@ func (server *Server) Login(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	token, err := server.SignIn(user.Username, user.Email, user.Password)
+
+	userDB := models.User{}
+	if len(user.Username) == 0 {
+		err = server.DB.Debug().Model(models.User{}).Where("email = ?", user.Email).Take(&userDB).Error
+	} else {
+		err = server.DB.Debug().Model(models.User{}).Where("username = ?", user.Username).Take(&userDB).Error
+	}
+
 	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		responses.ERROR(w, http.StatusNotFound, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, token)
-}
 
-func (server *Server) SignIn(username, email, password string) (string, error) {
-	var err error
-	user := models.User{}
-	if len(username) == 0 {
-		err = server.DB.Debug().Model(models.User{}).Where("email = ?", email).Take(&user).Error
-	} else {
-		err = server.DB.Debug().Model(models.User{}).Where("username = ?", username).Take(&user).Error
-	}
-
-	if err != nil {
-		return "", errors.New(fmt.Sprintf("%s", err))
-	}
-	if user.Password != password {
-		return "", errors.New("Wrong password")
+	if user.Password != userDB.Password {
+		responses.ERROR(w, http.StatusBadRequest, errors.New("Incorrect password"))
+		return
 	}
 
 	token, err := auth.CreateToken(user.ID)
 	if err != nil {
-		return "", err
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
 	}
+
 	user.Token = token
-	return token, nil
+	responses.JSON(w, http.StatusOK, token)
 }
 
 func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -68,21 +64,19 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	user.Password = r.FormValue("password")
 
 	user.Prepare()
-
 	err := user.Validate("")
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	userCreated, err := user.SaveUser(server.DB)
 
+	userCreated, err := user.SaveUser(server.DB)
 	if err != nil {
-		formattedError := formaterror.FormatError(err.Error())
-		responses.ERROR(w, http.StatusInternalServerError, formattedError)
+		responses.ERROR(w, http.StatusConflict, err)
 		return
 	}
 	w.Header().Set("id", fmt.Sprintf("%d", userCreated.ID))
-	responses.JSON(w, http.StatusCreated, userCreated)
+	responses.JSON(w, http.StatusCreated, userCreated.ID)
 }
 
 func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -92,28 +86,33 @@ func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+
 	user := models.User{}
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+
 	tokenId, err := auth.ExtractTokenID(r)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
+
 	user.Prepare()
 	err = user.Validate("update")
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
+
 	updatedUser, err := user.UpdateAUser(server.DB, tokenId)
 	if err != nil {
 		formattedError := formaterror.FormatError(err.Error())
@@ -142,8 +141,9 @@ func (server *Server) Logout(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusOK, "Logout successfully")
 		return
 	}
+
 	if result == false {
-		responses.ERROR(w, http.StatusUnauthorized, errors.New("Bad Authorization"))
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 }
