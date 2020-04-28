@@ -1,0 +1,43 @@
+{
+  "name": "woden-server",
+  "version": "1.0.0",
+  "description": "Specification for Wooden REST API",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run --spec cypress/integration/API/*.feature",
+    "cypress:tags": "cypress run -e TAGS='@step'",
+    "cypress:report": "cypress run --spec cypress/integration/API/POST_user.feature --reporter mochawesome && open ./mochawesome-report/mochawesome.html"
+  },
+  "dependencies": {
+    "generate-password": "^1.5.1",
+    "querystring": "0.2.0",
+    "superagent": "3.7.0"
+  },
+  "devDependencies": {
+    "mocha": "~2.3.4",
+    "sinon": "1.17.3",
+    "expect.js": "~0.3.1",
+    "cypress-file-upload": "^4.0.6",
+    "cypress-downloadfile": "^1.1.0",
+    "standard": "^12.0.1",
+    "cypress": "^4.4.1",
+    "cypress-cucumber-preprocessor": "^1.9.1",
+    "rimraf": "^2.6.2",
+    "mochawesome": "^3.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/482solutions/woden-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/482solutions/woden-server/issues"
+  },
+  "homepage": "https://github.com/482solutions/woden-server#readme"
+}

@@ -1,3 +1,6 @@
 .idea
 storage
 .github
+package-lock.json
+node_modules/
+cypress/fixtures/example.json
