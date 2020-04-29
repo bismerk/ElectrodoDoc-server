@@ -4,14 +4,16 @@
   "description": "Specification for Wooden REST API",
   "main": "index.js",
   "directories": {
-    "doc": "docs"
+    "doc": "../docs"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --spec cypress/integration/API/*.feature",
     "cypress:tags": "cypress run -e TAGS='@step'",
-    "cypress:report": "cypress run --spec cypress/integration/API/POST_user.feature --reporter mochawesome && open ./mochawesome-report/mochawesome.html"
+    "cypress:report": "cypress run --spec cypress/integration/API/POST_user.feature --reporter mochawesome && open ./mochawesome-report/mochawesome.html",
+    "build": "docker-compose up --build",
+    "up": "docker-compose up --abort-on-container-exit"
   },
   "dependencies": {
     "generate-password": "^1.5.1",

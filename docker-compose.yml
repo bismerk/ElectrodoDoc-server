@@ -3,8 +3,8 @@ services:
   backend:
     container_name: backend
     build: .
-    ports: 
-      - 8080:8080 
+    ports:
+      - 8080:8080
     restart: on-failure
     volumes:
       - api:/usr/src/app/
@@ -29,7 +29,7 @@ services:
        - database_postgres:/var/lib/postgresql
      networks:
        - woden
-    
+
   pgadmin:
      image: dpage/pgadmin4
      container_name: pgadmin
@@ -52,9 +52,28 @@ services:
       - ./storage/redis:/data
     entrypoint: redis-server --appendonly yes
 
+  cypress:
+    image: cypress
+    build: ./e2e
+#      context: cypress
+#    dockerfile: ./e2e/Dockerfile
+    container_name: cypress
+    depends_on:
+      - backend
+    environment:
+      - CYPRESS_baseUrl=http://backend:8080
+#    network_mode: service:backend
+    working_dir: /e2e
+    command: npx cypress run
+    volumes:
+#      -./:/e2e
+      - ./e2e/cypress:/root/cypress
+      - ./e2e/cypress.json:/root/cypress.json
+
 volumes:
   api:
   database_postgres:
+  cypress:
 
 # Networks to be created to facilitate communication between containers
 networks:

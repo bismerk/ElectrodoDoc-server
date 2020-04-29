@@ -1,8 +1,8 @@
 import {Given, When, Then} from "cypress-cucumber-preprocessor/steps";
 const generator = require('generate-password');
+// cy.log(JSON.stringify(csr))
 
-// cy.log(JSON.stringify(user))
-const basicURL = 'http://localhost:8080/api/v1/user';
+const basic = 'api/v1/user';
 const headers = {
     'content-type': 'multipart/form-data',
     'accept': 'application/json'
@@ -54,26 +54,31 @@ Then(/^There is no token$/, function () {
 });
 
 Given(/^I send request for "POST" user$/, function(){
-    cy.request({
-        method: 'POST',
-        url: basicURL,
-        headers: headers,
-        form: true,
-        body: {
-            "login": login,
-            "email": email,
-            "password": password
-        },
-    }).then((resp) => {
-        expect(resp.statusText).to.eq('Created')
-        user = resp
+    const csr = cy.fixture('csr.txt').then(() => {
+        cy.request({
+            method: 'POST',
+            url: basic,
+            headers: headers,
+            form: true,
+            body: {
+                "login": login,
+                "email": email,
+                "password": password,
+                // TODO add CSR to all steps
+                "CSR": csr,
+            },
+        }).then((resp) => {
+            expect(resp.statusText).to.eq('Created')
+            user = resp
+        })
     })
+    // const csr =  cy.readFile('cypress/fixtures/csr.txt');
 });
 
 Given(/^I send request for POST user without login$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -91,7 +96,7 @@ Given(/^I send request for POST user without login$/, function () {
 Given(/^I send request for POST user without password$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -108,7 +113,7 @@ Given(/^I send request for POST user without password$/, function () {
 Given(/^I send request for POST user without csr$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -126,7 +131,7 @@ Given(/^I send request for POST user without csr$/, function () {
 Given(/^I send request for POST user without email$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -144,7 +149,7 @@ Given(/^I send request for POST user without email$/, function () {
 Given(/^I send a request for "POST" user twice$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -157,7 +162,7 @@ Given(/^I send a request for "POST" user twice$/, function () {
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: {
             'content-type': 'multipart/form-data',
             'accept': 'application/json'
@@ -179,7 +184,7 @@ Given(/^I send a request for "POST" user twice$/, function () {
 Given(/^I send request for POST user with login in field email$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -197,7 +202,7 @@ Given(/^I send request for POST user with login in field email$/, function () {
 Given(/^I send request for POST user with email in field login$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -219,7 +224,7 @@ Given(/^I send request for POST user with username that contain 2 uppercase lett
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -240,7 +245,7 @@ Given(/^I send request for POST user with username that contain 2 lowercase lett
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -261,7 +266,7 @@ Given(/^I send request for POST user with username that contain 20 uppercase let
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -282,7 +287,7 @@ Given(/^I send request for POST user with username that contain 20 lowercase let
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -303,7 +308,7 @@ Given(/^I send request for POST user with username that contain 3 uppercase lett
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -324,7 +329,7 @@ Given(/^I send request for POST user with username that contain 3 lowercase lett
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -345,7 +350,7 @@ Given(/^I send request for POST user with username that contain 19 uppercase let
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -366,7 +371,7 @@ Given(/^I send request for POST user with username that contain 19 lowercase let
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -388,7 +393,7 @@ Given(/^I send request for POST user with username that contain only numbers$/, 
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -408,7 +413,7 @@ Given(/^I send request for POST user with username that contain letters in upper
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -429,7 +434,7 @@ Given(/^I send request for POST user with username that contain 2 words with upp
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -450,7 +455,7 @@ Given(/^I send request for POST user with username that contain only 1 letter$/,
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -471,7 +476,7 @@ Given(/^I send request for POST user with username that contain 21 characters$/,
     })
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -488,7 +493,7 @@ Given(/^I send request for POST user with username that contain 21 characters$/,
 Given(/^I send request for POST user with username that contain only spaces$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -505,7 +510,7 @@ Given(/^I send request for POST user with username that contain only spaces$/, f
 Given(/^I send request for POST user with email that contain 2 @@$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -522,7 +527,7 @@ Given(/^I send request for POST user with email that contain 2 @@$/, function ()
 Given(/^I send request for POST user with email that not contain domain name$/, function () {
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -545,7 +550,7 @@ Given(/^I send request for POST user with password that contain 101 characters$/
     cy.log(passw)
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
@@ -568,7 +573,7 @@ Given(/^I send request for POST user with password that contain 100 characters$/
     cy.log(passw)
     cy.request({
         method: 'POST',
-        url: basicURL,
+        url: basic,
         headers: headers,
         form: true,
         body: {
