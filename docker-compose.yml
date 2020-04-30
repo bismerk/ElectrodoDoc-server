@@ -55,20 +55,12 @@ services:
   cypress:
     image: cypress
     build: ./e2e
-#      context: cypress
-#    dockerfile: ./e2e/Dockerfile
     container_name: cypress
+#    working_dir: /e2e
     depends_on:
       - backend
-    environment:
-      - CYPRESS_baseUrl=http://backend:8080
-#    network_mode: service:backend
-    working_dir: /e2e
-    command: npx cypress run
-    volumes:
-#      -./:/e2e
-      - ./e2e/cypress:/root/cypress
-      - ./e2e/cypress.json:/root/cypress.json
+    network_mode: host
+
 
 volumes:
   api:
