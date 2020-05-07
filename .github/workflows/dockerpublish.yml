@@ -1,22 +1,17 @@
 name: Docker
 
 on:
-  # Run tests for any PRs.
-  pull_request:
+ pull_request:
 
 env:
-  # TODO: Change variable to your image's name.
-  IMAGE_NAME: image
+ IMAGE_NAME: image
 
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
-  test:
-    runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+ stop_all_afrer_few_min_in_any_case:
+ runs-on: ubuntu-latest
 
-      - name: Run tests
-        run: docker-compose --file docker-compose.yml build
-  
+ steps:
+ - uses: actions/checkout@v2
+ - name: stop all afrer few minutes
+ run: docker-compose up & sleep 300 && docker-compose down
