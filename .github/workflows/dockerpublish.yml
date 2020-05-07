@@ -9,9 +9,9 @@ env:
 jobs:
 
  stop_all_afrer_few_min_in_any_case:
- runs-on: ubuntu-latest
+   runs-on: ubuntu-latest
 
- steps:
- - uses: actions/checkout@v2
- - name: stop all afrer few minutes
- run: docker-compose up & sleep 300 && docker-compose down
+   steps:
+     - uses: actions/checkout@v2
+     - name: stop all afrer few minutes
+   run: docker-compose up & sleep 300 && docker-compose down
