@@ -29,5 +29,5 @@ jobs:
     - run: npm run build
     - run: npm npm run cypress:run
 
-       env:
+      env:
         CI: true
