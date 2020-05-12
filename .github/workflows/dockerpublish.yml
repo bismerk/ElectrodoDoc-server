@@ -1,17 +1,35 @@
-name: Docker
+name: Node.js CI
 
 on:
- pull_request:
+  push:
 
-env:
- IMAGE_NAME: image
+  pull_request:
+
 
 jobs:
+  build:
 
- stop_all_afrer_few_min_in_any_case:
-   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-   steps:
-     - uses: actions/checkout@v2
-     - name: stop all afrer few minutes
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
+    steps:
+    
+    - uses: actions/checkout@v2
+    - name: stop all afrer few minutes
        run: docker-compose up --abort-on-container-exit & sleep 300 && docker-compose down
+       
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+      working-directory: ./e2e
+    - run: npm i
+    - run: npm run build
+    - run: npm npm run cypress:run
+
+       env:
+        CI: true
