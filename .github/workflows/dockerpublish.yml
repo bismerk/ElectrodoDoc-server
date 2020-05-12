@@ -25,10 +25,9 @@ jobs:
       
       with:
         node-version: ${{ matrix.node-version }}       
-      working-directory: ./e2e
-    - run: npm i
-    - run: npm run build
-    - run: npm npm run cypress:run
+    - run: npm --prefix ./e2e i
+    - run: npm --prefix ./e2e run build
+    - run: npm --prefix ./e2e run cypress:run
 
       env:
         CI: true
