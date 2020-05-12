@@ -21,9 +21,7 @@ jobs:
     - name: stop all afrer few minutes
        run: docker-compose up --abort-on-container-exit & sleep 300 && docker-compose down
        
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
       working-directory: ./e2e
