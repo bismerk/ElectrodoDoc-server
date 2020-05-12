@@ -1,0 +1,16 @@
+FROM ubuntu:latest
+RUN apt-get update
+ARG DEBIAN_FRONTEND=noninteractive
+COPY . .
+RUN apt-get install -y  curl apt-utils apt-transport-https
+RUN apt-get install -y libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb apt curl apt-utils apt-transport-https
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash
+RUN apt-get -y install nodejs
+RUN npm install
+#CMD ["npm", "run", "cypress:run"] 
+CMD ["sleep", "infinity"]
+
+#FROM cypress/base
+#COPY . .
+#RUN npm install
+#CMD ["npm", "run", "cypress:run"] 
