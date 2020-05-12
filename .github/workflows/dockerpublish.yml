@@ -11,9 +11,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x]
+##    strategy:
+##      matrix:
+##        node-version: [10.x, 12.x]
 
     steps:
     
@@ -23,8 +23,8 @@ jobs:
        
 ##    - uses: actions/setup-node@v1
       
-      with:
-        node-version: ${{ matrix.node-version }}       
+##      with:
+##        node-version: ${{ matrix.node-version }}       
     - run: docker-compose up -d && npm --prefix ./e2e i && npm --prefix ./e2e run cypress:run && sleep 500 && docker-compose down
 ##    - run: 
 ##    - run: 
