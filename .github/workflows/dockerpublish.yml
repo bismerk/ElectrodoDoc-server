@@ -22,12 +22,13 @@ jobs:
       run: docker-compose up --abort-on-container-exit & sleep 300 && docker-compose down
        
     - uses: actions/setup-node@v1
+      
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ matrix.node-version }}       
+      working-directory: ./e2e
     - run: npm i
     - run: npm run build
     - run: npm npm run cypress:run
-      working-directory: ./e2e
 
       env:
         CI: true
