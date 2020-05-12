@@ -52,20 +52,20 @@ services:
       - ./storage/redis:/data
     entrypoint: redis-server --appendonly yes
 
-  cypress:
-    image: cypress
-    build: ./e2e
-    container_name: cypress
+##  cypress:
+##    image: cypress
+##    build: ./e2e
+##    container_name: cypress
 #    working_dir: /e2e
-    depends_on:
-      - backend
-    network_mode: host
+##    depends_on:
+##      - backend
+##    network_mode: host
 
 
 volumes:
   api:
   database_postgres:
-  cypress:
+##  cypress:
 
 # Networks to be created to facilitate communication between containers
 networks:
