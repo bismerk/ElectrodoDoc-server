@@ -25,7 +25,7 @@ jobs:
       
       with:
         node-version: ${{ matrix.node-version }}       
-    - run: docker-compose up -d && npm --prefix ./e2e i && npm --prefix ./e2e run cypress:run && sleep 300 && docker-compose down
+    - run: docker-compose up -d && npm --prefix ./e2e i && npm --prefix ./e2e run cypress:run && sleep 500 && docker-compose down
 ##    - run: 
 ##    - run: 
 
