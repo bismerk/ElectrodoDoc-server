@@ -1,4 +1,4 @@
-# Go API Server for Woden
+# Go API Server for ElectrodoDoc
 
 Specification for Wooden REST API
 
